@@ -8,12 +8,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
@@ -29,8 +23,7 @@ declare module "next-auth" {
   // }
 }
 
-/// https://next-auth.js.org/configuration/providers/oauth
-const authOptions: NextAuthOptions = { 
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Ethereum",
@@ -48,46 +41,43 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         try {
-          const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"))
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL)
+          const siwe = new SiweMessage(
+            JSON.parse(credentials?.message || "{}")
+          );
+          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL);
 
           const result = await siwe.verify({
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({ req: { headers: req.headers }}),
-          })
+            nonce: await getCsrfToken({ req: { headers: req.headers } }),
+          });
 
           if (result.success) {
             return {
               id: siwe.address,
-            }
+            };
           }
-          return null
+          return null;
         } catch (e) {
-          return null
+          return null;
         }
       },
     }),
   ],
   callbacks: {
     async session({ session, token }: { session: any; token: any }) {
-      session.address = token.sub
-      session.user.name = token.sub
-      session.user.image = "https://www.fillmurray.com/128/128"
-      return session
+      session.address = token.sub;
+      session.user.name = token.sub;
+      session.user.image = `https://avatar.vercel.sh/${token.sub}.png`;
+      return session;
     },
   },
-  session: { 
+  session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET
-}
+  secret: process.env.NEXTAUTH_SECRET,
+};
 
-/**
- * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
- *
- * @see https://next-auth.js.org/configuration/nextjs
- */
 export const getServerAuthSession = (ctx: {
   req: GetServerSidePropsContext["req"];
   res: GetServerSidePropsContext["res"];

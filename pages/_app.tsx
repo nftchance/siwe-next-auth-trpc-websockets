@@ -1,40 +1,26 @@
-import { Session } from "next-auth"
-import { SessionProvider, getSession } from "next-auth/react"
-import type { AppProps } from "next/app"
-import { WagmiConfig, createClient, configureChains, chain } from "wagmi"
-import { publicProvider } from "wagmi/providers/public"
-import "./styles.css"
-import { api } from "~/utils/api"
+import { Session } from "next-auth";
+import { SessionProvider, getSession } from "next-auth/react";
+import type { AppType } from "next/app";
 
-export const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
-  [publicProvider()]
-)
+import WalletProvider from "~/contexts/WalletProvider";
 
-const client = createClient({
-  autoConnect: true,
-  provider,
-})
+import { api } from "~/utils/api";
 
-import type { AppType } from 'next/app';
-
+import "./styles.css";
 
 // Use of the <SessionProvider> is mandatory to allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 const MyApp: AppType<{
   session: Session | null;
-}> = ({
-  Component,
-  pageProps,
-}) => {
+}> = ({ Component, pageProps }) => {
   return (
-    <WagmiConfig client={client}>
-      <SessionProvider session={pageProps.session}>
+    <SessionProvider session={pageProps.session}>
+      <WalletProvider>
         <Component {...pageProps} />
-      </SessionProvider>
-    </WagmiConfig>
-  )
-}
+      </WalletProvider>
+    </SessionProvider>
+  );
+};
 
 MyApp.getInitialProps = async ({ ctx }) => {
   return {

@@ -8,13 +8,6 @@ export default function ServerSidePage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data: sessionData } = useSession();
 
-  if (!session?.user.name)
-    return (
-      <Layout>
-        <h1>You do not have permission</h1>
-      </Layout>
-    );
-
   return (
     <Layout>
       <h1>Server Side Session</h1>

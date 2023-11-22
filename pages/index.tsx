@@ -1,14 +1,20 @@
-import Layout from "../components/layout"
+import Link from "next/link";
+import Siwe from "~/components/siwe";
+import Layout from "../components/layout";
 
 export default function IndexPage() {
   return (
     <Layout>
-      <h1>NextAuth.js Example</h1>
+      <h1>Realtime Web3</h1>
       <p>
-        This is an example site to demonstrate how to use{" "}
-        <a href="https://next-auth.js.org">NextAuth.js</a> and 
-        Sign-In with Ethereum for authentication.
+        The framework that gives you the tools need to craft the UX your users
+        want.
       </p>
+
+      <Siwe />
+
+      <Link href="/client">Client Side Rendering</Link>
+      <Link href="/server">Server Side Rendering</Link>
     </Layout>
-  )
+  );
 }

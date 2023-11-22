@@ -1,37 +1,20 @@
-import { appRouter } from './api/root';
-import { applyWSSHandler } from '@trpc/server/adapters/ws';
+import { applyWSSHandler } from "@trpc/server/adapters/ws";
+import { getSession } from "next-auth/react";
 import ws from "ws";
 
-import * as trpcNext from '@trpc/server/adapters/next';
-import { NodeHTTPCreateContextFnOptions } from '@trpc/server/adapters/node-http';
-import { IncomingMessage } from 'http';
-import { getSession } from 'next-auth/react';
-import { createInnerTRPCContext } from './api/trpc';
-
-/**
- * Creates context for an incoming request
- * @link https://trpc.io/docs/context
- */
-export const createContext = async (
-  opts:
-| NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
-) => {
-  const session = await getSession(opts);
-
-  console.log('createContext for', session?.user?.name ?? 'unknown user');
-
-  return createInnerTRPCContext({
-    session,
-  })
-};
-
-export type Context = Awaited<ReturnType<typeof createContext>>;
+import { createInnerTRPCContext } from "./api/trpc";
+import { appRouter } from "./api/root";
 
 const wss = new ws.Server({ port: 3001 });
 const handler = applyWSSHandler({
 	wss,
 	router: appRouter,
-	createContext
+	createContext: async (opts) => {
+		const session = await getSession(opts);
+		return createInnerTRPCContext({
+			session,
+		});
+	},
 });
 
 wss.on("connection", (ws) => {

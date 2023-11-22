@@ -9,7 +9,7 @@ the intricacies of things that are less than obvious so that you can just get up
 
 ```ml
 - Ethereum Wallet
-- Next - Static and Dynamic Pages
+- Static and Dynamic Pages: Next
 - API: Websockets + Next Server Routes with TRPC
 - Authentication: NextAuth & Siwe (Can support web2 providers with ease.)
 - Wallet connection: Web3Modal, Wagmi, Viem

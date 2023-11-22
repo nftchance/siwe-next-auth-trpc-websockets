@@ -1,19 +1,28 @@
+import { api } from "~/utils/api"
 import Layout from "../components/layout"
+import { useState } from "react"
 
 export default function ApiExamplePage() {
+  const publicQuery = api.public.useQuery()
+  const protectedQuery = api.protected.useQuery()
+
+  const [randomNumber, setRandomNumber] = useState(0)
+  api.randomNumber.useSubscription(undefined, { 
+    onData: (data) => {
+      setRandomNumber(data)
+    }
+  })
+
   return (
     <Layout>
-      <h1>API Example</h1>
-      <p>The examples below show responses from the example API endpoints.</p>
-      <p>
-        <em>You must be signed in to see responses.</em>
-      </p>
-      <h2>Session</h2>
-      <p>/api/examples/session</p>
-      <iframe src="/api/examples/session" />
-      <h2>JSON Web Token</h2>
-      <p>/api/examples/jwt</p>
-      <iframe src="/api/examples/jwt" />
+      <h2>Public</h2>
+      <p>{publicQuery.data ? publicQuery.data : 'Loading...'}</p>
+
+      <h2>Protected</h2>
+      <p>{protectedQuery.data ? protectedQuery.data : 'Loading...'}</p>
+
+      <h2>Random Number Subscription</h2>
+      <p>{randomNumber}</p>
     </Layout>
   )
 }

@@ -3,7 +3,7 @@ import { SiweMessage } from "siwe"
 import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi"
 import Layout from "../components/layout"
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 function Siwe() {
   const { signMessageAsync } = useSignMessage()
@@ -49,7 +49,9 @@ function Siwe() {
 
   return (
     <Layout>
-      <button
+      {session ? <>
+        {session.user?.name}
+      </> : <button
         onClick={(e) => {
           e.preventDefault()
           if (!isConnected) {
@@ -60,7 +62,7 @@ function Siwe() {
         }}
       >
         Sign-in
-      </button>
+      </button>}
     </Layout>
   )
 }

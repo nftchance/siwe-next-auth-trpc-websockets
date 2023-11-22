@@ -1,22 +1,21 @@
-![header](/images/siwenextauth.png)
+# Real-Time Web3 Application Template
 
-# Sign-In with Ethereum and NextAuth.js Example
+With the recent library updates it has become increasingly difficult to piece together all the modern tools.
 
-This Sign-In with Ethereum NextAuth.js example is the result of a code-along tutorial
-to help developers get their hands on a fully functional and easy to understand demo.
+This is a template that combines everything together so that you can avoid wasting hours reading out of date docs and battling
+the intricacies of things that are less than obvious so that you can just get up and running.
 
-A full tutorial on how to set up the example can be found [here](https://docs.login.xyz/integrations/nextauth.js).
+## Dependencies
 
-## Getting Started
+```ml
+- Ethereum Wallet
+- Next - Static and Dynamic Pages
+- API: Websockets + Next Server Routes with TRPC
+- Authentication: NextAuth & Siwe (Can support web2 providers with ease.)
+- Wallet connection: Web3Modal, Wagmi, Viem
+```
 
-### Dependencies 
-
-- [Yarn](https://classic.yarnpkg.com/en/docs/install)
-- [Node.js](https://nodejs.org/en/)
-- [MetaMask extension wallet](https://metamask.io/)
-- An Ethereum account in MetaMask
-
-### Setting Up Your Environment
+## Setting Up Your Environment
 
 Change the name of `.env.local.example` to `.env.local`, and fill in the following two values:
 
@@ -24,18 +23,12 @@ Change the name of `.env.local.example` to `.env.local`, and fill in the followi
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=somereallysecretsecret
 ```
+
 ## Running the Example
 
 You can use the following commands to run the example:
 
 ```bash
-yarn install
-yarn run dev
+pnpm i
+pnpm dev
 ```
-
-## Live Demo
-
-A live demo of the example can be found [here](https://siwe-next-auth-example2.vercel.app/).
-
-## License
-ISC

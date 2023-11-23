@@ -12,9 +12,8 @@ export default function IndexPage() {
       </p>
 
       <Siwe />
-
-      <Link href="/client">Client Side Rendering</Link>
-      <Link href="/server">Server Side Rendering</Link>
+      <Link href="/example">API Examples</Link>
+      <Link href="/protected">Protected Route</Link>
     </Layout>
   );
 }

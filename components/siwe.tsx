@@ -1,65 +1,70 @@
+import { useState, type FC } from 'react';
+
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
+
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { SiweMessage } from "siwe";
-import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
-import Layout from "../components/layout";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { useEffect } from "react";
 
-function Siwe() {
-  const { signMessageAsync } = useSignMessage();
-  const { chain } = useNetwork();
+export type SiweProps = Partial<{
+  callbackUrl: string
+  redirect: boolean
+}>
+
+const Siwe: FC<SiweProps> = ({ callbackUrl = '/protected', redirect = false } = { }) => { const { chain } = useNetwork();
+  const { data: session } = useSession()
+  const { open } = useWeb3Modal()
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  });
-  const { data: session } = useSession();
+  const { signMessageAsync } = useSignMessage();
 
-  const handleLogin = async () => {
-    try {
-      const callbackUrl = "/protected";
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in with Ethereum to the app.",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-        callbackUrl,
-      });
-    } catch (error) {
-      window.alert(error);
+  const [error, setError] = useState<unknown | null>(null);
+
+  const isAuthenticated = session !== undefined
+
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+
+    // ? This user is already authenticated.
+    if(isAuthenticated) return
+
+    setError(null)
+
+    if(isConnected) { 
+      try {
+        const message = new SiweMessage({
+          domain: window.location.host,
+          address,
+          statement: "Sign in to Plug by signing this message to prove your identity.",
+          uri: window.location.origin,
+          version: "1",
+          chainId: chain?.id,
+          nonce: await getCsrfToken(),
+        });
+        const signature = await signMessageAsync({
+          message: message.prepareMessage(),
+        });
+
+        signIn("credentials", {
+          message: JSON.stringify(message),
+          redirect,
+          signature,
+          callbackUrl,
+        });
+      } catch (error: unknown) {
+        setError(error)
+      }
     }
+
+    // * The user must be connected before they can be authenticated.
+    open()
   };
 
-  useEffect(() => {
-    console.log(isConnected);
-    if (isConnected && !session) {
-      handleLogin();
-    }
-  }, [isConnected]);
-
   return (
-    <button
-      onClick={(e) => {
-        e.preventDefault();
-        if (!isConnected) {
-          connect();
-        } else {
-          handleLogin();
-        }
-      }}
-    >
-      Sign-in
-    </button>
+    <>
+      <button onClick={handleLogin}>Sign-in</button>
+
+      {error}
+    </>
   );
 }
 
